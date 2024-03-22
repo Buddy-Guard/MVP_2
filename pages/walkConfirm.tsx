@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { LogoImage, Avatar1, Avatar2, next } from "../public/assets/images";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -8,6 +8,11 @@ import Map from "../pages/map";
 import initializeFirebaseClient from "../lib/initFirebase";
 import { getAuth, User } from "firebase/auth";
 import { collection, onSnapshot } from "firebase/firestore";
+
+import { Web3Button } from "@thirdweb-dev/react";
+
+import { useMiContexto } from '../components/context/HexValueContext'; 
+
 
 interface UserLocation {
   location: {
@@ -32,9 +37,20 @@ const WalkConfirm = () => {
 
   const { db: firestore } = initializeFirebaseClient();
 
+  const contractAddress = "0x4eefa835a807c36dd0a643a7d97cd6e2b8ca29c2";
+  const guardians = ["0xE1e5E0b3830454d68aE7B8926540a8AC0FdcabC0"];
+  const addressTest = "0x030550677367301B46383eE6Bc07F7F989191458"
+
+  const { miValor, setMiValor } = useMiContexto() as any;
+
+  const handleUpdate = (_miValor: number) => {
+    setMiValor(_miValor);
+  };
+
+
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user: any) => {
       setCurrentUser(user);
     });
 
@@ -59,65 +75,6 @@ const WalkConfirm = () => {
       unsubscribe();
     };
   }, []);
-
-  async function HandleCreateOrder() {
-    //const contractAddress = process.env.BUDDY_GUARD_CONTRACT;
-    const contractAddress = "0x4eefa835a807c36dd0a643a7d97cd6e2b8ca29c2";
-    const guardians = ["0xE1e5E0b3830454d68aE7B8926540a8AC0FdcabC0"];
-
-    // Check if Ethereum is available in the browser
-    if (!window.ethereum) {
-      console.error(
-        "Error: Ethereum provider not found. Please install MetaMask or another Ethereum wallet."
-      );
-      return;
-    }
-
-    // Request access to the user's Ethereum account and signature
-    try {
-      await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-    } catch (error) {
-      console.error("Error requesting Ethereum account access:", error);
-      return;
-    }
-
-    // Use the injected provider from MetaMask
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-    // Get the signer
-    const signer = provider.getSigner();
-
-    // Instantiate the contract
-    const buddyGuardAbi = [
-      "function createOrder(address[] memory _guardians) public",
-    ];
-    const buddyGuardContract = new ethers.Contract(
-      contractAddress,
-      buddyGuardAbi,
-      signer
-    );
-
-    console.log(`Creating order ...`);
-
-    try {
-      // Send the transaction
-      const tx = await buddyGuardContract.createOrder(guardians);
-      await tx.wait();
-      console.log(`Order created successfully. Transaction hash: ${tx.hash}`);
-      const txHash = tx.hash;
-      const url = `https://sepolia.arbiscan.io/tx/${txHash}`;
-      const message = `Buddy Guard was selected!!`;
-      window.alert(message);
-      window.open(url, "_blank");
-
-      router.push("/walkStatus"); // Redirect to walkStatus page after order creation
-    } catch (error) {
-      console.error("Error creating order:", error);
-      // Handle error here, e.g., display an error message to the user
-    }
-  }
 
   return (
     <Layout>
@@ -229,16 +186,38 @@ const WalkConfirm = () => {
                 15 mins Away to Your Destination
               </span>
             </div>
-            {/* Confirm Button */}
-            <button
+            <Web3Button
               className="bg-[#ECEC04] px-4 py-2  w-full flex items-center justify-center text-[#121418] font-lato animate-pulse"
-              onClick={async () => {
-                await HandleCreateOrder();
+              contractAddress="0x4eefa835a807c36dd0a643a7d97cd6e2b8ca29c2"
+              action={(contract) => contract.call('createOrder', [guardians])}
+              onSuccess={(result) => {
+                const data = result;
+  
+                // Make sure data.receipt and data.receipt.events exist to avoid errors
+                if (data.receipt && data.receipt.events) {
+                  const targetEvent = data.receipt.events.find((event: { event: string; }) => event.event === "OrderCreated");
+                  
+                  if (targetEvent) {
+                    // This assumes you want to save the "args" array from the targetEvent
+                    const variableToSave = targetEvent.args;
+                    console.log(`variableToSave`, variableToSave)
+                    const hexValue = variableToSave['0']?._hex;
+                    console.log(hexValue)
+                    const parsedValue = parseInt(hexValue, 16); // Parse hex string to integer
+                    console.log(`parsedValue: ${parsedValue}`);
+                    handleUpdate(parsedValue);
+
+                    // console.log(`hexValue: ${hexValue}`);
+                    // Use variableToSave as needed. If it's not used, this line can be omitted
+                  }
+                }
+                // console.log(`Result: ${JSON.stringify(result)}`);
+                router.push("/walkStatus");
               }}
-            >
-              CONFIRM
-              <Image src={next} className="w-8 h-8 ml-4" alt="Live" />
-            </button>
+              onError={(error) => alert(`Something went wrong! Error: ${error}`)}
+              >
+                CONFIRM
+            </Web3Button>
           </div>
         </div>
       </div>

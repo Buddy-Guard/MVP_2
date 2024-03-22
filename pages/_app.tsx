@@ -3,16 +3,15 @@ import type { AppProps } from "next/app";
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import {
-  metamaskWallet,
-  coinbaseWallet,
-  walletConnect,
   localWallet,
-  embeddedWallet,
   ThirdwebProvider,
 } from "@thirdweb-dev/react";
 import { ArbitrumSepolia, Sepolia } from "@thirdweb-dev/chains";
+import { MiProveedor } from '../components/context/HexValueContext'; 
+
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 
 export const StatusContext = React.createContext({
   statusText: "",
@@ -34,6 +33,10 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     setScreenSize();
   });
+  const HexValueContext = React.createContext(0);
+
+  const decimalValue = 0;
+
 
   const { locale } = useRouter() as { locale: string };
 
@@ -45,21 +48,17 @@ export default function App({ Component, pageProps }: AppProps) {
         authConfig={{
           domain: process.env.NEXT_PUBLIC_THIRDWEB_AUTH_DOMAIN || "",
         }}
-        activeChain={Sepolia}
+        activeChain={ArbitrumSepolia}
         clientId="833996b2d080980da3975eb07563f830"
         supportedWallets={[
-          metamaskWallet(),
-          coinbaseWallet({ recommended: true }),
-          walletConnect(),
+    
           localWallet(),
-          embeddedWallet({
-            auth: {
-              options: ["google", "apple"],
-            },
-          }),
+       
         ]}
       >
-        <Component {...pageProps} />
+        <MiProveedor>
+          <Component {...pageProps} />
+        </MiProveedor>
       </ThirdwebProvider>
     </QueryClientProvider>
   );

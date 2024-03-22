@@ -29,6 +29,12 @@ import initializeFirebaseClient from "../lib/initFirebase";
 import { getAuth, User } from "firebase/auth";
 import Map from "../pages/map";
 
+import { Web3Button } from "@thirdweb-dev/react";
+
+import { useMiContexto } from '../components/context/HexValueContext'; 
+
+
+
 interface UserLocation {
   location: {
     latitude: number;
@@ -84,9 +90,12 @@ const WalkStatus = () => {
 
   const { db: firestore } = initializeFirebaseClient();
 
+  const { miValor, setMiValor } = useMiContexto() as any;
+
+
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user : any) => {
       setCurrentUser(user);
     });
 
@@ -121,182 +130,183 @@ const WalkStatus = () => {
     setSelectedBuddyGuard(buddyGuard);
   };
   // Add Guardian
-  const handleAddBuddyGuard = async () => {
-    if (!selectedBuddyGuard) {
-      console.error("No Buddy Guard selected.");
-      return;
-    }
-    handleChangeGuardians();
+  // const handleAddBuddyGuard = async () => {
+  //   if (!selectedBuddyGuard) {
+  //     console.error("No Buddy Guard selected.");
+  //     return;
+  //   }
+  //   //handleChangeGuardians();
 
-    // Add the selected buddy guard to the isCurrentBuddyGuard array
-    setIsCurrentBuddyGuard((prevCurrentBuddyGuards) => [
-      ...prevCurrentBuddyGuards,
-      selectedBuddyGuard,
-    ]);
+  //   // // Add the selected buddy guard to the isCurrentBuddyGuard array
+  //   // setIsCurrentBuddyGuard((prevCurrentBuddyGuards) => [
+  //   //   ...prevCurrentBuddyGuards,
+  //   //   selectedBuddyGuard,
+  //   // ]);
 
-    // Remove the selected buddy guard from the nearbyBuddyGuards list
-    setNearbyBuddyGuards((prevNearbyBuddyGuards) =>
-      prevNearbyBuddyGuards.filter(
-        (buddyGuard) => buddyGuard.id !== selectedBuddyGuard.id
-      )
-    );
+  //   // // Remove the selected buddy guard from the nearbyBuddyGuards list
+  //   // setNearbyBuddyGuards((prevNearbyBuddyGuards) =>
+  //   //   prevNearbyBuddyGuards.filter(
+  //   //     (buddyGuard) => buddyGuard.id !== selectedBuddyGuard.id
+  //   //   )
+  //   // );
 
-    // Reset the selected buddy guard state
-    setSelectedBuddyGuard(null);
-  };
+  //   // Reset the selected buddy guard state
+  //   //setSelectedBuddyGuard(null);
+  // };
 
   // Remove Guardian
-  const handleRemoveBuddyGuard = async (buddyGuardToRemove: BuddyGuard) => {
-    if (!buddyGuardToRemove) {
-      console.error("No buddy guard selected for removal.");
-      return;
-    }
+  // const handleRemoveBuddyGuard = async (buddyGuardToRemove: BuddyGuard) => {
+  //   if (!buddyGuardToRemove) {
+  //     console.error("No buddy guard selected for removal.");
+  //     return;
+  //   }
 
-    handleChangeGuardians();
+  //   //handleChangeGuardians();
+    
 
-    // Add the selected buddy guard back to the nearbyBuddyGuards list
-    setNearbyBuddyGuards((prevNearbyBuddyGuards) => [
-      ...prevNearbyBuddyGuards,
-      buddyGuardToRemove,
-    ]);
+  //   // // Add the selected buddy guard back to the nearbyBuddyGuards list
+  //   // setNearbyBuddyGuards((prevNearbyBuddyGuards) => [
+  //   //   ...prevNearbyBuddyGuards,
+  //   //   buddyGuardToRemove,
+  //   // ]);
 
-    // Remove the selected buddy guard from the isCurrentBuddyGuard array
-    setIsCurrentBuddyGuard((prevCurrentBuddyGuards) => {
-      const updatedCurrentBuddyGuards = prevCurrentBuddyGuards.filter(
-        (guard) => guard.id !== buddyGuardToRemove.id
-      );
+  //   // // Remove the selected buddy guard from the isCurrentBuddyGuard array
+  //   // setIsCurrentBuddyGuard((prevCurrentBuddyGuards) => {
+  //   //   const updatedCurrentBuddyGuards = prevCurrentBuddyGuards.filter(
+  //   //     (guard) => guard.id !== buddyGuardToRemove.id
+  //   //   );
 
-      return updatedCurrentBuddyGuards;
-    });
+  //   //   return updatedCurrentBuddyGuards;
+  //   // });
 
-    // Reset the selected remove buddy guard state
-    setSelectedRemoveBuddyGuard(null);
-  };
+  //   // Reset the selected remove buddy guard state
 
-  async function handleChangeGuardians() {
-    // Check if Ethereum is available in the browser
-    if (!window.ethereum) {
-      console.error(
-        "Error: Ethereum provider not found. Please install MetaMask or another Ethereum wallet."
-      );
-      return;
-    }
+  // };
 
-    // Request access to the user's Ethereum account and signature
-    try {
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-    } catch (error) {
-      console.error("Error requesting Ethereum account access:", error);
-      return;
-    }
+  // async function handleChangeGuardians() {
+  //   // Check if Ethereum is available in the browser
+  //   if (!window.ethereum) {
+  //     console.error(
+  //       "Error: Ethereum provider not found. Please install MetaMask or another Ethereum wallet."
+  //     );
+  //     return;
+  //   }
 
-    // Use the injected provider from MetaMask
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //   // Request access to the user's Ethereum account and signature
+  //   try {
+  //     await window.ethereum.request({ method: "eth_requestAccounts" });
+  //   } catch (error) {
+  //     console.error("Error requesting Ethereum account access:", error);
+  //     return;
+  //   }
 
-    // Get the current user's wallet
-    const userWallet = provider.getSigner();
+  //   // Use the injected provider from MetaMask
+  //   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    // Get the address of the BuddyGuard contract from environment variables
-    const buddyGuardAddress = "0x4EeFA835A807c36DD0a643A7D97cD6E2b8Ca29c2";
+  //   // Get the current user's wallet
+  //   const userWallet = provider.getSigner();
 
-    // ABI for the BuddyGuard contract's `changeGuardians` function
-    const buddyGuardABI = [
-      "function changeGuardians(uint256 _orderId, address[] calldata _guardiansToAdd, address[] calldata _guardiansToRemove) external",
-    ];
+  //   // Get the address of the BuddyGuard contract from environment variables
+  //   const buddyGuardAddress = "0x4EeFA835A807c36DD0a643A7D97cD6E2b8Ca29c2";
 
-    // Connect to the BuddyGuard contract using the user's wallet
-    const buddyGuardContract = new ethers.Contract(
-      buddyGuardAddress,
-      buddyGuardABI,
-      userWallet
-    );
+  //   // ABI for the BuddyGuard contract's `changeGuardians` function
+  //   const buddyGuardABI = [
+  //     "function changeGuardians(uint256 _orderId, address[] calldata _guardiansToAdd, address[] calldata _guardiansToRemove) external",
+  //   ];
 
-    // Specify the order ID and guardians to add/remove
-    const orderId = isOrderId;
-    const guardiansToAdd = selectedBuddyGuard
-      ? [selectedBuddyGuard.address]
-      : [];
-    const guardiansToRemove = selectedRemoveBuddyGuard
-      ? [selectedRemoveBuddyGuard.address]
-      : [];
+  //   // Connect to the BuddyGuard contract using the user's wallet
+  //   const buddyGuardContract = new ethers.Contract(
+  //     buddyGuardAddress,
+  //     buddyGuardABI,
+  //     userWallet
+  //   );
 
-    try {
-      // Call the `changeGuardians` function on the BuddyGuard contract
-      const tx = await buddyGuardContract.changeGuardians(
-        orderId,
-        guardiansToAdd,
-        guardiansToRemove,
-        {
-          gasLimit: 10000000, // Specify your desired gas limit here
-        }
-      );
+  //   // Specify the order ID and guardians to add/remove
+  //   const orderId = isOrderId;
+  //   const guardiansToAdd = selectedBuddyGuard
+  //     ? [selectedBuddyGuard.address]
+  //     : [];
+  //   const guardiansToRemove = selectedRemoveBuddyGuard
+  //     ? [selectedRemoveBuddyGuard.address]
+  //     : [];
 
-      await tx.wait(); // Wait for the transaction to be mined
+  //   try {
+  //     // Call the `changeGuardians` function on the BuddyGuard contract
+  //     const tx = await buddyGuardContract.changeGuardians(
+  //       orderId,
+  //       guardiansToAdd,
+  //       guardiansToRemove,
+  //       {
+  //         gasLimit: 10000000, // Specify your desired gas limit here
+  //       }
+  //     );
 
-      console.log("Guardians changed successfully");
-      console.log("Guardians to add:", guardiansToAdd);
-      console.log("Guardians to remove:", guardiansToRemove);
+  //     await tx.wait(); // Wait for the transaction to be mined
 
-      window.alert("Guardians changed successfully");
-    } catch (error) {
-      console.error("Error changing guardians:", error);
-    }
-  }
+  //     console.log("Guardians changed successfully");
+  //     console.log("Guardians to add:", guardiansToAdd);
+  //     console.log("Guardians to remove:", guardiansToRemove);
 
-  async function handleCompleteOrder() {
-    try {
-      // The address of the deployed buddyGuard contract
-      const contractAddress = "0x4EeFA835A807c36DD0a643A7D97cD6E2b8Ca29c2";
+  //     window.alert("Guardians changed successfully");
+  //   } catch (error) {
+  //     console.error("Error changing guardians:", error);
+  //   }
+  // }
 
-      // The ID of the order to complete
-      const orderId = isOrderId; // Example order ID, replace with actual order ID
+  // async function handleCompleteOrder() {
+  //   try {
+  //     // The address of the deployed buddyGuard contract
+  //     const contractAddress = "0x4EeFA835A807c36DD0a643A7D97cD6E2b8Ca29c2";
 
-      // Check if Ethereum is available in the browser
-      if (!window.ethereum) {
-        throw new Error(
-          "Ethereum provider not found. Please install MetaMask or another Ethereum wallet."
-        );
-      }
+  //     // The ID of the order to complete
+  //     const orderId = isOrderId; // Example order ID, replace with actual order ID
 
-      // Request access to the user's Ethereum account and signature
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+  //     // Check if Ethereum is available in the browser
+  //     if (!window.ethereum) {
+  //       throw new Error(
+  //         "Ethereum provider not found. Please install MetaMask or another Ethereum wallet."
+  //       );
+  //     }
 
-      // Use the injected provider from MetaMask
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //     // Request access to the user's Ethereum account and signature
+  //     await window.ethereum.request({ method: "eth_requestAccounts" });
 
-      // Get the signer
-      const signer = provider.getSigner();
+  //     // Use the injected provider from MetaMask
+  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      // The ABI for the buddyGuard contract's `completeOrder` function
-      const contractABI = ["function completeOrder(uint256 _orderId) external"];
+  //     // Get the signer
+  //     const signer = provider.getSigner();
 
-      // Connect to the buddyGuard contract
-      const buddyGuard = new ethers.Contract(
-        contractAddress,
-        contractABI,
-        signer
-      );
+  //     // The ABI for the buddyGuard contract's `completeOrder` function
+  //     const contractABI = ["function completeOrder(uint256 _orderId) external"];
 
-      // Call the `completeOrder` function
-      console.log(`Completing order with ID: ${orderId}`);
-      const tx = await buddyGuard.completeOrder(orderId, {
-        gasLimit: 10000000, // Specify your desired gas limit here
-      });
-      await tx.wait(); // Wait for the transaction to be mined
+  //     // Connect to the buddyGuard contract
+  //     const buddyGuard = new ethers.Contract(
+  //       contractAddress,
+  //       contractABI,
+  //       signer
+  //     );
 
-      console.log(
-        `Order with ID ${orderId} completed successfully. Transaction Hash: ${tx.hash}`
-      );
+  //     // Call the `completeOrder` function
+  //     console.log(`Completing order with ID: ${orderId}`);
+  //     const tx = await buddyGuard.completeOrder(orderId, {
+  //       gasLimit: 10000000, // Specify your desired gas limit here
+  //     });
+  //     await tx.wait(); // Wait for the transaction to be mined
 
-      const txHash = tx.hash;
-      const url = `https://sepolia.arbiscan.io/tx/${txHash}`;
-      const message = `Buddy Guard service order completed successfully!! Transaction Hash: ${txHash}`;
-      window.alert(message);
-      window.open(url, "_blank");
-    } catch (error) {
-      console.error("Error completing order:", error);
-    }
-  }
+  //     console.log(
+  //       `Order with ID ${orderId} completed successfully. Transaction Hash: ${tx.hash}`
+  //     );
+
+  //     const txHash = tx.hash;
+  //     const url = `https://sepolia.arbiscan.io/tx/${txHash}`;
+  //     const message = `Buddy Guard service order completed successfully!! Transaction Hash: ${txHash}`;
+  //     window.alert(message);
+  //     window.open(url, "_blank");
+  //   } catch (error) {
+  //     console.error("Error completing order:", error);
+  //   }
+  // }
 
   const handleArrive = async () => {
     try {
@@ -361,6 +371,10 @@ const WalkStatus = () => {
       // setError("Error updating user data. Please try again later.");
     }
   };
+
+  // function uint256(arg0: number): any {
+  //   throw new Error("Function not implemented.");
+  // }
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {
@@ -490,12 +504,46 @@ const WalkStatus = () => {
                 </div>
                 {/* Add Button */}
                 {selectedBuddyGuard && (
-                  <button
-                    onClick={handleAddBuddyGuard}
-                    className="bg-[#ECEC04] text-[#0A0A0A] font-lato py-1 w-1/4 "
-                  >
-                    ADD
-                  </button>
+                  // <button
+                  //   onClick={handleAddBuddyGuard}
+                  //   className="bg-[#ECEC04] text-[#0A0A0A] font-lato py-1 w-1/4 "
+                  // >
+                  //   ADD
+                  // </button>
+                  <Web3Button
+                  className="bg-[#ECEC04] text-[#0A0A0A] font-lato py-1 w-1/4 "
+                  contractAddress="0x4eefa835a807c36dd0a643a7d97cd6e2b8ca29c2"
+                  action={(contract) => {
+                    //handleAddBuddyGuard();
+                    
+                    const handleAddBuddyGuard = async () => {
+                      console.log("BuddyGuardList:", miValor);
+                      await contract.call('changeGuardians', [miValor,[selectedBuddyGuard?.address],[]]);
+                      // Add the selected buddy guard to the isCurrentBuddyGuard array
+                      setIsCurrentBuddyGuard((prevCurrentBuddyGuards) => [
+                        ...prevCurrentBuddyGuards,
+                        selectedBuddyGuard,
+                      ]);
+
+                      // Remove the selected buddy guard from the nearbyBuddyGuards list
+                      setNearbyBuddyGuards((prevNearbyBuddyGuards) =>
+                        prevNearbyBuddyGuards.filter(
+                          (buddyGuard) => buddyGuard.id !== selectedBuddyGuard.id
+                        )
+                      );
+                    }
+                    handleAddBuddyGuard();
+                  }}              
+                  onSuccess={async (result) => {
+                  setSelectedBuddyGuard(null);
+                  console.log(result);
+          
+                }}
+                onError={(error) => alert(`Something went wrong! Error: ${error}`)}
+                >
+                  ADD
+                </Web3Button>
+                  
                 )}
               </div>
             </div>
@@ -515,12 +563,46 @@ const WalkStatus = () => {
               {/* Display remove button for each buddy guard in isCurrentBuddyGuard */}
               {isCurrentBuddyGuard.map((buddyGuard) => (
                 <div key={buddyGuard.id} className="relative py-1">
-                  <button
+                  {/* <button
                     onClick={() => handleRemoveBuddyGuard(buddyGuard)}
                     className=" absolute top-4 right-10 bg-[#ECEC04] text-[#0A0A0A] font-lato py-1 w-1/4   items-center justify-center"
                   >
                     REMOVE
-                  </button>
+                  </button> */}
+                  <Web3Button
+                    className=" absolute top-4 right-10 bg-[#ECEC04] text-[#0A0A0A] font-lato py-1 w-1/4   items-center justify-center"
+                    contractAddress="0x4eefa835a807c36dd0a643a7d97cd6e2b8ca29c2"
+                    action={(contract) => {
+                      //handleRemoveBuddyGuard(buddyGuard);
+                      const handleRemoveBuddyGuard = async (buddyGuardToRemove: BuddyGuard) => {
+                        console.log("BuddyGuardList:", miValor);
+                        await contract.call('changeGuardians', [miValor,[],[selectedRemoveBuddyGuard?.address]]);
+                        // Add the selected buddy guard back to the nearbyBuddyGuards list
+                        setNearbyBuddyGuards((prevNearbyBuddyGuards) => [
+                          ...prevNearbyBuddyGuards,
+                          buddyGuard,
+                        ]);
+
+                        // Remove the selected buddy guard from the isCurrentBuddyGuard array
+                        setIsCurrentBuddyGuard((prevCurrentBuddyGuards) => {
+                          const updatedCurrentBuddyGuards = prevCurrentBuddyGuards.filter(
+                            (guard) => guard.id !== buddyGuard.id
+                          );
+
+                          return updatedCurrentBuddyGuards;
+                        });
+                    }
+                    handleRemoveBuddyGuard(buddyGuard);
+                  }}              
+                    onSuccess={async (result) => {
+                    setSelectedRemoveBuddyGuard(null);
+                    console.log(result);
+            
+                  }}
+                  onError={(error) => alert(`Something went wrong! Error: ${error}`)}
+                  >
+                    REMOVE
+                  </Web3Button>
                   <Image
                     className="w-16 h-16 rounded-full relative border-4 border-[#ECEC04] p-1 "
                     src={buddyGuard.avatar}
@@ -538,18 +620,22 @@ const WalkStatus = () => {
                 {/* <Image src={help} className="w-7 h-7 ml-1" alt="Complete" /> */}
               </button>
 
-              <button
-                onClick={async () => {
-                  await handleCompleteOrder();
-                  await handleArrive();
-
-                  router.push("/home");
-                }}
-                className="bg-[#ECEC04] flex flex-row text-[#0A0A0A] justify-center items-center font-lato py-2 w-full animate-pulse "
+              <Web3Button
+              className="bg-[#4F9171] text-white font-latoBlack py-2 rounded-lg"
+              contractAddress="0x4eefa835a807c36dd0a643a7d97cd6e2b8ca29c2"
+              action={(contract) => {
+                console.log("mi Valor en walkStatus:", miValor);
+                contract.call('completeOrder', [ethers.BigNumber.from(miValor)]);
+              }}              onSuccess={async (result) => {
+              
+                console.log(result);
+                await handleArrive();
+                router.push("/home");
+              }}
+              onError={(error) => alert(`Something went wrong! Error: ${error}`)}
               >
                 ARRIVED
-                <Image src={complete} className="w-7 h-7 ml-1" alt="Complete" />
-              </button>
+              </Web3Button>
             </div>
           </div>
         </div>

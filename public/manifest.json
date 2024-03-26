@@ -1,0 +1,22 @@
+{
+    "short_name": "BuddyGuard",
+    "name": "BuddyGuard Safety dApp",
+    "icons": [
+      {
+        "src": "/buddy_logo.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/buddy_logo_5.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "start_url": "/",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#000000"
+  }
+  

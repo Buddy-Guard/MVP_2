@@ -9121,6 +9121,13 @@ onetime@^6.0.0:
   dependencies:
     mimic-fn "^4.0.0"
 
+only-allow@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.npmjs.org/only-allow/-/only-allow-1.2.1.tgz"
+  integrity sha512-M7CJbmv7UCopc0neRKdzfoGWaVZC+xC1925GitKH9EAqYFzX9//25Q7oX4+jw0tiCCj+t5l6VZh8UPH23NZkMA==
+  dependencies:
+    which-pm-runs "^1.1.0"
+
 openpgp@^5.5.0:
   version "5.11.1"
   resolved "https://registry.npmjs.org/openpgp/-/openpgp-5.11.1.tgz"
@@ -11441,10 +11448,10 @@ viem@^2.7.14:
     isows "1.0.3"
     ws "8.13.0"
 
-web-vitals@^3.5.2:
-  version "3.5.2"
-  resolved "https://registry.npmjs.org/web-vitals/-/web-vitals-3.5.2.tgz"
-  integrity sha512-c0rhqNcHXRkY/ogGDJQxZ9Im9D19hDihbzSQJrsioex+KnFgmMzBiy57Z1EjkhX/+OjyBpclDCzz2ITtjokFmg==
+web-vitals@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.npmjs.org/web-vitals/-/web-vitals-2.1.4.tgz"
+  integrity sha512-sVWcwhU5mX6crfI5Vd2dC4qchyTqxV8URinzt25XqVh+bHEPGH4C3NPrNionCP7Obx59wrYEbNlw4Z8sjALzZg==
 
 web3-core-helpers@1.10.4:
   version "1.10.4"
@@ -11764,6 +11771,11 @@ which-module@^2.0.0:
   version "2.0.1"
   resolved "https://registry.npmjs.org/which-module/-/which-module-2.0.1.tgz"
   integrity sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==
+
+which-pm-runs@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.npmjs.org/which-pm-runs/-/which-pm-runs-1.1.0.tgz"
+  integrity sha512-n1brCuqClxfFfq/Rb0ICg9giSZqCS+pLtccdag6C2HyufBrh3fBOiy9nb6ggRMvWOVH5GrdJskj5iGTZNxd7SA==
 
 which-typed-array@^1.1.13, which-typed-array@^1.1.14, which-typed-array@^1.1.2, which-typed-array@^1.1.9:
   version "1.1.14"

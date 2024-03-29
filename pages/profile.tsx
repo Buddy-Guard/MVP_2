@@ -229,8 +229,9 @@ const Profile = () => {
           verified: true,
           waltIdCertification: response.data,
         });
-
+        if (typeof window !== "undefined") {
         window.location.reload();
+        }
       }
     } catch (error) {
       console.error("Error issuing Verifiable Credential:");

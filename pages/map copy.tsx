@@ -64,6 +64,7 @@ const Map = () => {
   const [selectedMarker, setSelectedMarker] = useState<any>(null);
 
   const onLoad = useCallback(function callback(map: any) {
+    if (typeof window !== "undefined") {
     const bounds = new window.google.maps.LatLngBounds();
     locations.forEach((location) => {
       bounds.extend(
@@ -73,6 +74,7 @@ const Map = () => {
     map.fitBounds(bounds);
 
     setMap(map);
+    }
   }, []);
 
   const onMarkerClick = (marker: any) => {

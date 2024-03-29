@@ -49,7 +49,9 @@ const Home = () => {
     try {
       await handleSendMessage(signer); // Call handleSendMessage function
       console.log("SOS message sent successfully");
+      if (typeof window !== "undefined") {
       window.alert("SOS message sent successfully");
+      }
     } catch (error) {
       console.error("Error sending SOS message:", error);
     }

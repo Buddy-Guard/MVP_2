@@ -91,10 +91,12 @@ const Hangout = () => {
                   <div
                     className="border-[#ECEC04] border-4 flex flex-row space-x-3 px-3 py-5 relative"
                     onClick={() =>
+                      {if (typeof window !== "undefined") {
                       window.open(
                         "https://testnets.opensea.io/assets/sepolia/0x5d417ceea6c8982d64965df86ea11bcc82f46db3/0",
                         "_blank"
                       )
+                      }}
                     }
                   >
                     <div className="w-1/2 flex flex-row justify-center items-center ">

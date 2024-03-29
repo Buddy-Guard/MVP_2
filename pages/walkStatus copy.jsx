@@ -126,23 +126,29 @@ const WalkStatus = () => {
 
   async function handleChangeGuardians() {
     // Check if Ethereum is available in the browser
+    if (typeof window !== "undefined") {
     if (!window.ethereum) {
       console.error(
         "Error: Ethereum provider not found. Please install MetaMask or another Ethereum wallet."
       );
       return;
     }
+    }
 
     // Request access to the user's Ethereum account and signature
     try {
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (typeof window !== "undefined") {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+      }
     } catch (error) {
       console.error("Error requesting Ethereum account access:", error);
       return;
     }
 
     // Use the injected provider from MetaMask
+    if (typeof window !== "undefined") {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
+    }
 
     // Get the current user's wallet
     const userWallet = provider.getSigner();
@@ -238,8 +244,10 @@ const WalkStatus = () => {
       const txHash = tx.hash;
       const url = `https://sepolia.arbiscan.io/tx/${txHash}`;
       const message = `Buddy Guard service order completed successfully!! Transaction Hash: ${txHash}`;
+      if (typeof window !== "undefined") {
       window.alert(message);
       window.open(url, "_blank");
+      }
     } catch (error) {
       console.error("Error completing order:", error);
     }

@@ -8,9 +8,6 @@ import {
 } from "@thirdweb-dev/react";
 import { ArbitrumSepolia, Sepolia } from "@thirdweb-dev/chains";
 import { MiProveedor } from '../components/context/HexValueContext'; 
-//optional
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
 
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,6 +37,18 @@ export default function App({ Component, pageProps }: AppProps) {
       };
     
       setScreenSize();
+    }
+  }, []);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.ts').then(registration => {
+          console.log('SW registered: ', registration);
+        }).catch(registrationError => {
+          console.log('SW registration failed: ', registrationError);
+        });
+      });
     }
   }, []);
 

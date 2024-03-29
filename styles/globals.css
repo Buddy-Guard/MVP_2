@@ -26,3 +26,14 @@
     display: none; /* Hide on larger screens if necessary */
   }
 }
+
+.someContainerClass {
+  height: calc(100vh - env(safe-area-inset-bottom) - env(safe-area-inset-top))
+}
+
+@supports (-webkit-touch-callout: none) {
+  .someContainerClass {
+    /* for ios safari 15, safe-area-inset-bottom is 0, so a special fix apply here */
+    height: -webkit-fill-available;
+  }
+}
